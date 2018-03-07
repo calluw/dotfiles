@@ -1,0 +1,5 @@
+set adjust-open "best-fit"
+set recolor "true"
+set recolor-darkcolor "#eec3af"
+set recolor-lightcolor "#021924"
+set default-bg "#021924"
