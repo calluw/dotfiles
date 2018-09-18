@@ -50,6 +50,16 @@ values."
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
+     auto-completion
+     better-defaults
+     emacs-lisp
+     git
+     ;; markdown
+     org
+     (shell :variables
+             shell-default-height 30
+             shell-default-position 'bottom)
+     ;; spell-checking
      syntax-checking
      version-control
      evil-commentary
@@ -322,7 +332,6 @@ you should place your code here."
 
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
-
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
