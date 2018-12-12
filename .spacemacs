@@ -31,7 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     rust
+     yaml
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -50,21 +50,19 @@ values."
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
-     auto-completion
      better-defaults
      emacs-lisp
      git
-     ;; markdown
      org
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
-     ;; spell-checking
      syntax-checking
      version-control
      evil-commentary
      spotify
      c-c++
+     python
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -143,8 +141,8 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(dracula
-                         spacegray
-                         soft-morning)
+                         soft-morning
+                         spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -307,7 +305,7 @@ values."
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup nil
+   dotspacemacs-whitespace-cleanup 'changed
    ))
 
 (defun dotspacemacs/user-init ()
@@ -331,7 +329,37 @@ you should place your code here."
   (setq tramp-default-method "ssh")
 
   (setq-default indent-tabs-mode nil)
+
+  ;; Try to display docstrings
+  (setq auto-completion-enable-help-tooltip t)
+
+  ;; Lisp mode settings
+  (add-hook 'elisp-mode-hook '(lambda() (set (make-local-variable 'semantic-mode) nil)))
+
+  ;; C mode settings
+  (add-hook 'c-mode-hook 'fci-mode)
+  (add-hook 'c-mode-hook 'auto-fill-mode)
   (setq-default c-basic-offset 4)
+
+  ;; Python mode settings
+  (add-hook 'python-mode-hook 'fci-mode)
+  (add-hook 'python-mode-hook 'auto-fill-mode)
+  (setq-default python-indent-offset 4)
+  (setq python-shell-interpreter "python3")
+
+  ;; Org mode tweaks and settings
+  (add-hook 'org-mode-hook 'auto-fill-mode)
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/todo.org" "New")
+           "* TODO %?\n %i\n %a")
+          ("n" "Note" entry (file+headline "~/org/notes.org" "New")
+           "* %?\n %i\n")
+          )
+        )
+
+  ;; en-mirror.el
+  (load "~/ensoft_slick/src/enmacros/en-mirror.el")
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -346,6 +374,7 @@ you should place your code here."
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(evil-want-Y-yank-to-eol nil)
+ '(org-agenda-files (quote ("~/org/todo.org")))
  '(package-selected-packages
    (quote
     (insert-shebang company-shell stickyfunc-enhance srefactor mmm-mode markdown-toc helm-gtags gh-md ggtags spacegray-theme toml-mode racer flycheck-rust cargo markdown-mode rust-mode dracula-theme-theme dracula-theme git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flycheck-pos-tip pos-tip flycheck evil-commentary diff-hl yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic disaster company-c-headers cmake-mode clang-format spacegrey-theme spotify helm-spotify-plus multi xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy evil-magit magit magit-popup git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
