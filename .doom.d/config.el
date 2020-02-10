@@ -32,6 +32,55 @@
 ;; `nil' to disable it:
 (setq display-line-numbers-type 'relative)
 
+(setq-default display-line-numbers-width nil)
+(setq-default tramp-default-method "ssh")
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+;; C mode settings
+(add-hook 'c-mode-hook
+          (lambda ()
+            (fci-mode)
+            (auto-fill-mode)
+            (highlight-indentation-mode)
+            ))
+(setq-default c-basic-offset 4)
+
+;; Python mode settings
+(add-hook 'python-mode-hook
+          (lambda ()
+            (fci-mode)
+            (auto-fill-mode)
+            ))
+(setq-default python-indent-offset 4)
+(setq python-shell-interpreter "python3")
+(setq python-shell-interpreter-args "-i")
+
+; Raise the number of errors flycheck will report:
+; this is unstable but for large files we need to
+(setq flycheck-checker-error-threshold 600)
+
+;; Rust mode settings
+(add-hook 'rust-mode-hook
+          (lambda ()
+            (fci-mode)
+            (auto-fill-mode)
+            (highlight-indentation-mode)
+            ))
+(setq-default rust-indent-offset 4)
+
+;; Org mode tweaks and settings
+(add-hook 'org-mode-hook 'auto-fill-mode)
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/org/todo.org" "New")
+         "* TODO %?\n %i\n %a")
+        ("n" "Note" entry (file+headline "~/org/notes.org" "New")
+         "* %?\n %i\n")
+        )
+      )
+
+(load! ../ensoft_slick/src/enmacros/en-mirror.el)
+
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
