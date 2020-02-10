@@ -51,6 +51,7 @@
           (lambda ()
             (fci-mode)
             (auto-fill-mode)
+            (setq flycheck-checker #'python-flake8)
             ))
 (setq-default python-indent-offset 4)
 (setq python-shell-interpreter "python3")
@@ -79,7 +80,23 @@
         )
       )
 
+;; Set up the en-mirror macros for use
 (load! ../ensoft_slick/src/enmacros/en-mirror.el)
+
+;;; Keybindings
+
+;; Window switching straight from Leader-<N> instead of Leader-w-<N>
+; NOTE: requires winum installed via :ui windows +number
+(map! :leader :desc "Switch to window 0 or 10" "0" #'winum-select-window-0-or-10)
+(map! :leader :desc "Switch to window 1" "1" #'winum-select-window-1)
+(map! :leader :desc "Switch to window 2" "2" #'winum-select-window-2)
+(map! :leader :desc "Switch to window 3" "3" #'winum-select-window-3)
+(map! :leader :desc "Switch to window 4" "4" #'winum-select-window-4)
+(map! :leader :desc "Switch to window 5" "5" #'winum-select-window-5)
+(map! :leader :desc "Switch to window 6" "6" #'winum-select-window-6)
+(map! :leader :desc "Switch to window 7" "7" #'winum-select-window-7)
+(map! :leader :desc "Switch to window 8" "8" #'winum-select-window-8)
+(map! :leader :desc "Switch to window 9" "9" #'winum-select-window-9)
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
