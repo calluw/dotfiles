@@ -30,8 +30,9 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(perl5
      yaml
+     json
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -40,8 +41,8 @@ values."
      helm
      (auto-completion :variables
                       auto-completion-enable-snippets-in-popup t)
-     emacs-lisp
-     gtags
+     multiple-cursors
+     neotree
      git
      markdown
      org
@@ -52,17 +53,15 @@ values."
              shell-default-position 'bottom)
      better-defaults
      emacs-lisp
-     git
-     org
-     (shell :variables
-             shell-default-height 30
-             shell-default-position 'bottom)
      syntax-checking
      version-control
      evil-commentary
      spotify
-     c-c++
-     python
+     lsp
+     dap
+     (c-c++ :variables c-c++-backend 'lsp-ccls)
+     (python :variables python-backend 'lsp)
+     (rust :variables rust-backend 'lsp)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -141,6 +140,7 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(dracula
+                         spacegray
                          soft-morning
                          spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
@@ -182,10 +182,10 @@ values."
    dotspacemacs-retain-visual-state-on-shift t
    ;; If non-nil, J and K move lines up and down when in visual mode.
    ;; (default nil)
-   dotspacemacs-visual-line-move-text nil
+   dotspacemacs-visual-line-move-text t
    ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
    ;; (default nil)
-   dotspacemacs-ex-substitute-global nil
+   dotspacemacs-ex-substitute-global t
    ;; Name of the default layout (default "Default")
    dotspacemacs-default-layout-name "Default"
    ;; If non nil the default layout name is displayed in the mode-line.
@@ -264,17 +264,16 @@ values."
    ;; Control line numbers activation.
    ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
    ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
-   ;; This variable can also be set to a property list for finer control:
-   ;; '(:relative nil
-   ;;   :disabled-for-modes dired-mode
-   ;;                       doc-view-mode
-   ;;                       markdown-mode
-   ;;                       org-mode
-   ;;                       pdf-view-mode
-   ;;                       text-mode
-   ;;   :size-limit-kb 1000)
+   ;; This variable can also be set to a property list for finer control
    ;; (default nil)
-   dotspacemacs-line-numbers 'relative
+   dotspacemacs-line-numbers '(:relative t
+     :disabled-for-modes dired-mode
+                         doc-view-mode
+                         markdown-mode
+                         org-mode
+                         pdf-view-mode
+                         text-mode
+     :size-limit-kb 1000)
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
@@ -289,6 +288,15 @@ values."
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
    dotspacemacs-highlight-delimiters 'all
+   ;; If non-nil, start an Emacs server if one is not already running.
+   ;; (default nil)
+   dotspacemacs-enable-server 't
+   ;; Set the emacs server socket location.
+   ;; If nil, uses whatever the Emacs default is, otherwise a directory path
+   ;; like \"~/.emacs.d/server\". It has no effect if
+   ;; `dotspacemacs-enable-server' is nil.
+   ;; (default nil)
+   dotspacemacs-server-socket-dir nil
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
@@ -296,6 +304,27 @@ values."
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
    dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   ;; Format specification for setting the frame title.
+   ;; %a - the `abbreviated-file-name', or `buffer-name'
+   ;; %t - `projectile-project-name'
+   ;; %I - `invocation-name'
+   ;; %S - `system-name'
+   ;; %U - contents of $USER
+   ;; %b - buffer name
+   ;; %f - visited file name
+   ;; %F - frame name
+   ;; %s - process status
+   ;; %p - percent of buffer above top of window, or Top, Bot or All
+   ;; %P - percent of buffer above bottom of window, perhaps plus Top, or Bot or All
+   ;; %m - mode name
+   ;; %n - Narrow if appropriate
+   ;; %z - mnemonics of buffer, terminal, and keyboard coding systems
+   ;; %Z - like %z, but including the end-of-line format
+   ;; (default "%I@%S")
+   dotspacemacs-frame-title-format "%b:%t"
+   ;; Format specification for setting the icon title format
+   ;; (default nil - same as frame-title-format)
+   dotspacemacs-icon-title-format nil
    ;; The default package repository used if no explicit repository has been
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
@@ -306,6 +335,7 @@ values."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'changed
+   dotspacemacs-mode-line-theme 'spacemacs
    ))
 
 (defun dotspacemacs/user-init ()
@@ -324,11 +354,13 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (global-linum-mode 1)
-  (setq powerline-default-separator 'wave)
-  (setq tramp-default-method "ssh")
+  ;; Reduce the margin width
+  (setq-default display-line-numbers-width nil)
+  (setq-default powerline-default-separator 'wave)
+  (setq-default tramp-default-method "ssh")
 
   (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
 
   ;; Try to display docstrings
   (setq auto-completion-enable-help-tooltip t)
@@ -337,15 +369,39 @@ you should place your code here."
   (add-hook 'elisp-mode-hook '(lambda() (set (make-local-variable 'semantic-mode) nil)))
 
   ;; C mode settings
-  (add-hook 'c-mode-hook 'fci-mode)
-  (add-hook 'c-mode-hook 'auto-fill-mode)
+  (add-hook 'c-mode-hook
+            (lambda ()
+              (fci-mode)
+              (lsp-mode)
+              (auto-fill-mode)
+              (highlight-indentation-mode)
+              ))
   (setq-default c-basic-offset 4)
 
   ;; Python mode settings
-  (add-hook 'python-mode-hook 'fci-mode)
-  (add-hook 'python-mode-hook 'auto-fill-mode)
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (fci-mode)
+              (lsp-mode)
+              (auto-fill-mode)
+              ))
   (setq-default python-indent-offset 4)
   (setq python-shell-interpreter "python3")
+  (setq python-shell-interpreter-args "-i")
+
+  ; Raise the number of errors flycheck will report:
+  ; this is unstable but for large files we need to
+  (setq flycheck-checker-error-threshold 600)
+
+  ;; Rust mode settings
+  (add-hook 'rust-mode-hook
+            (lambda ()
+              (fci-mode)
+              (lsp-mode)
+              (auto-fill-mode)
+              (highlight-indentation-mode)
+              ))
+  (setq-default rust-indent-offset 4)
 
   ;; Org mode tweaks and settings
   (add-hook 'org-mode-hook 'auto-fill-mode)
@@ -360,10 +416,17 @@ you should place your code here."
   ;; en-mirror.el
   (load "~/ensoft_slick/src/enmacros/en-mirror.el")
 
+  ;; Fixed recentf non-input file warnings
+  ;;(cancel-timer recentf-auto-save-timer)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -374,10 +437,35 @@ you should place your code here."
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(evil-want-Y-yank-to-eol nil)
+ '(fci-rule-color "#343d46")
+ '(highlight-indentation-blank-lines nil)
+ '(highlight-indentation-offset 4)
+ '(hl-todo-keyword-faces
+   (quote
+    (("TODO" . "#dc752f")
+     ("NEXT" . "#dc752f")
+     ("THEM" . "#2d9574")
+     ("PROG" . "#3a81c3")
+     ("OKAY" . "#3a81c3")
+     ("DONT" . "#f2241f")
+     ("FAIL" . "#f2241f")
+     ("DONE" . "#42ae2c")
+     ("NOTE" . "#b1951d")
+     ("KLUDGE" . "#b1951d")
+     ("HACK" . "#b1951d")
+     ("TEMP" . "#b1951d")
+     ("FIXME" . "#dc752f")
+     ("XXX" . "#dc752f")
+     ("XXXX" . "#dc752f")
+     ("???" . "#dc752f"))))
  '(org-agenda-files (quote ("~/org/todo.org")))
  '(package-selected-packages
    (quote
-    (insert-shebang company-shell stickyfunc-enhance srefactor mmm-mode markdown-toc helm-gtags gh-md ggtags spacegray-theme toml-mode racer flycheck-rust cargo markdown-mode rust-mode dracula-theme-theme dracula-theme git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flycheck-pos-tip pos-tip flycheck evil-commentary diff-hl yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic disaster company-c-headers cmake-mode clang-format spacegrey-theme spotify helm-spotify-plus multi xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy evil-magit magit magit-popup git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (mu4e-maildirs-extension mu4e-alert ht yaml-mode company-quickhelp fish-mode insert-shebang company-shell stickyfunc-enhance srefactor mmm-mode markdown-toc helm-gtags gh-md ggtags spacegray-theme toml-mode racer flycheck-rust cargo markdown-mode rust-mode dracula-theme-theme dracula-theme git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flycheck-pos-tip pos-tip flycheck evil-commentary diff-hl yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode company-anaconda anaconda-mode pythonic disaster company-c-headers cmake-mode clang-format spacegrey-theme spotify helm-spotify-plus multi xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy evil-magit magit magit-popup git-commit ghub let-alist with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+ '(pdf-view-midnight-colors (quote ("#655370" . "#fbf8ef")))
+ '(prog-mode-hook
+   (quote
+    (spacemacs/load-yasnippet spacemacs//show-trailing-whitespace smartparens-mode rainbow-delimiters-mode spacemacs//enable-hs-minor-mode highlight-parentheses-mode highlight-numbers-mode turn-on-evil-mc-mode spacemacs//load-evil-lisp-state auto-highlight-symbol-mode bug-reference-prog-mode goto-address-prog-mode)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -400,10 +488,12 @@ you should place your code here."
      (340 . "#ebcb8b")
      (360 . "#B4EB89"))))
  '(vc-annotate-very-old-color nil))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Iosevka" :foundry "CYEL" :slant normal :weight normal :height 98 :width normal)))))
+ '(default ((t (:family "Iosevka" :foundry "CYEL" :slant normal :weight normal :height 98 :width normal))))
+ '(highlight-indentation-current-column-face ((t (:background "dim grey"))))
+ '(highlight-indentation-face ((t (:background "#363644")))))
+)
