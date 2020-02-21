@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+en-ws-new $USER-ads:/nobackup/$USER/$1
+cd $HOME/Workspaces/$1
