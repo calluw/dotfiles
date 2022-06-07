@@ -2,6 +2,11 @@
 ;;; $DOOMDIR/packages.el
 
 (package! fill-column-indicator)
+;(package! bazel-mode)
+(package! yang-mode)
+(package! cython-mode)
+(package! flycheck-cython)
+(package! evil-tex)
 
 ;; This is where you install packages, by declaring them with the `package!'
 ;; macro, then running 'doom refresh' on the command line. You'll need to
