@@ -38,6 +38,7 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ 'do': 'bash install.sh',
     \ }
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'Vimjas/vim-python-pep8-indent'
 
 
 " End plugins list
@@ -52,6 +53,7 @@ let g:LanguageClient_serverCommands = {
     \ 'rust': ['~/.cargo/bin/rustup', 'run', 'nightly', 'rls'],
     \ 'python': ['/usr/bin/pyls'],
     \ 'c': ['/usr/bin/ccls'],
+    \ 'cpp': ['/usr/bin/ccls'],
     \ }
 
 " Set colourscheme
@@ -99,6 +101,11 @@ set softtabstop=4
 set expandtab
 set noshiftround
 filetype indent plugin on
+
+" Make header files show as "C" type by default
+augroup filetypedetect
+    au BufRead,BufNewFile *.h set filetype=c
+augroup END
 
 " Tweak filename tab completion, to:
 "   - complete as much as possible (first tab)

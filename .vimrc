@@ -14,7 +14,7 @@
 set nocompatible
 
 " Import shared keybindings
-source ~/.vim/keybinds.vim
+" source ~/.vim/keybinds.vim
 
 " Load plugins
 call plug#begin('~/.vim/plugged')
@@ -29,6 +29,10 @@ Plug 'airblade/vim-gitgutter'
 " End plugins list
 call plug#end()
 
+" =========== Plugin Setup =========
+" Let vim-gitgutter do its thing on large files
+let g:gitgutter_max_signs=10000
+
 " Set colourscheme
 colo dracula
 
@@ -38,8 +42,47 @@ set ruler
 " Turn on syntax highlighting.
 syntax on
 
-" Turn on 80 column highlight
+" Column highlight
 set cc=80
+
+" Enable cscope
+set cst
+set nocsverb
+if filereadable("cscope.out")
+    cs add cscope.out
+endif
+set csverb
+
+" C indentation
+"   : - amount to indent 'case' labels relative to the corresponding 'switch'
+"   t - function return type indentation
+"   ( - after an unclosed '(', amount to indent following lines relative to the
+"   character after the opening '('
+"   w - if 1, '(0' aligns following lines with the first character after the
+"   '(', rather than the first non-white character
+"   W - after an unclosed '(' that's the last character on its line, amount to
+"   indent the following lines
+set cinoptions=:0t0(0w1Ws
+
+" Fiddle with formatoptions to work nicely with comments
+"   c - auto-wrap comments using textwidth
+"   q - allow comment formatting with 'gq'
+"   r - insert comment leader (e.g. ' *') after <Enter> in insert mode
+"   o - insert comment leader after 'o' or 'O' in normal mode
+"   n - indent numbered lists correctly
+" NB: lots of people also have 't' enabled but I can't find what this does.
+set formatoptions=cqron
+
+" Tweak filename tab completion, to:
+"   - complete as much as possible (first tab)
+"   - show a list of all matches (second tab)
+"   - cycle through the options (more tabs)
+set wildmode=longest,list,full
+
+" Complete
+"   - the longest common prefix;
+"   - using a menu.
+set completeopt=longest,menu
 
 " Turn off modelines
 set modelines=0
@@ -50,9 +93,8 @@ noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
 noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
 
-" Uncomment below to set the max textwidth. Use a value corresponding to the 
-" width of your screen.
-" set textwidth=80
+" Uncomment below to set the max textwidth. Use a value corresponding to the width of your screen.
+set textwidth=79
 set formatoptions=tcqrn1
 set tabstop=4
 set shiftwidth=4
@@ -82,8 +124,7 @@ set showmode
 set showcmd
 set cmdheight=1
 
-" Highlight matching pairs of brackets. Use the '%' character to jump between 
-" them.
+" Highlight matching pairs of brackets. Use the '%' character to jump between them.
 set matchpairs+=<:>
 
 " Display different types of white spaces.
@@ -91,6 +132,7 @@ set list
 set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
 
 " Show line numbers
+set number
 set relativenumber
 
 " Set status line display
