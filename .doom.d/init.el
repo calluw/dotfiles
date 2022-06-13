@@ -23,8 +23,7 @@
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-       (vertico            ; future search engine
-        +icons)
+       vertico            ; future search engine
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -78,7 +77,7 @@
        ;;eshell            ; a consistent, cross-platform shell (WIP)
        ;;shell             ; a terminal REPL for Emacs
        ;;term              ; terminals in Emacs
-       ;;vterm             ; another terminals in Emacs
+       vterm             ; another terminals in Emacs
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
@@ -117,13 +116,13 @@
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       (csharp
-        +dotnet
-        +lsp)              ; unity, .NET, and mono shenanigans
+       ;; (csharp
+       ;;  +dotnet
+       ;;  +lsp)              ; unity, .NET, and mono shenanigans
        data                ; config/data formats
        ;;elixir            ; erlang done right
-       (elm
-        +lsp)              ; care for a cup of TEA?
+       ;; (elm
+       ;;  +lsp)              ; care for a cup of TEA?
        emacs-lisp          ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
@@ -181,7 +180,7 @@
 
        :app
        ;;calendar
-       irc               ; how neckbeards socialize
+       ;; irc      ; how neckbeards socialize
        ;;(rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 

@@ -18,7 +18,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "iosevka" :size 13))
+(setq doom-font (font-spec :family "iosevka" :size 14))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -103,13 +103,28 @@
             (auto-fill-mode)
             (setq-local fill-column 100)
             ))
+
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/org/todo.org" "New")
-         "* TODO %?\n %i\n %a")
-        ("n" "Note" entry (file+headline "~/org/notes.org" "New")
-         "* %?\n %i\n")
-        )
-      )
+      '(("i" "Inbox" entry (file+headline "~/org/inbox.org" "Inbox")
+         "* TODO %?\n%i")
+        ))
+
+(setq org-agenda-files '("~/org/"))
+(setq org-agenda-custom-commands
+      '(("d" "GTD day view"
+         ((agenda "" ((org-agenda-span 1) ; show daily view
+                      (org-agenda-start-day 'nil))) ; ensure it's for today
+          (todo "" ((org-agenda-files '("~/org/inbox.org"))
+                    (org-agenda-overriding-header "Refile:")))
+          (todo "TODO" ((org-agenda-files '("~/org/todo.org"))
+                        (org-agenda-overriding-header "Remaining tasks:")
+                        (org-agenda-sorting-strategy
+                         '((todo priority-down category-keep effort-up)))))
+          (stuck "" ((org-agenda-overriding-header "Stuck tasks:"))))
+         ((org-agenda-compact-blocks t) ; don't show section breaks
+          (org-agenda-files '("~/org/todo.org" "~/org.inbox.org")) ; don't show other files in agenda
+          ))
+        ))
 
 ;; Elm mode settings
 (add-hook 'elm-mode-hook
@@ -126,22 +141,9 @@
 (add-to-list 'auto-mode-alist '("\\.jam\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\Jamfile\\'" . conf-mode))
 
-;; Set up the en-mirror macros for use
-;(load! "../ensoft_slick/src/enmacros/en-mirror.el")
-
 ;; Temp issue solving the void variable from lsp-ui
-(setq lsp-ui-doc-winum-ignore t)
-(setq lsp-ui-doc--buffer-prefix " *lsp-ui-doc-")
-
-;; Settings recommended for use with elm-language-server
-(after! lsp
-  (setq lsp-enable-symbol-highlighting nil)
-  )
-(after! lsp-ui
-  (setq lsp-ui-doc-max-width 100)
-  (setq lsp-ui-doc-max-height 30)
-  (setq company-lsp-cache-candidates nil)
-  )
+;; (setq lsp-ui-doc-winum-ignore t)
+;; (setq lsp-ui-doc--buffer-prefix " *lsp-ui-doc-")
 
 ;; Attempt to stop Projectile using .project folders and reading as if files
 ;; This appears to be a Doom specific override to prefer .project, see
