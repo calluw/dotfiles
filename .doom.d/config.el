@@ -18,7 +18,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "iosevka" :size 14))
+(setq doom-font (font-spec :family "Iosevka" :size 10.5))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -36,66 +36,8 @@
 (setq-default tramp-default-method "ssh")
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-(setq-default fci-column 80)
-(setq-default fill-column 80)
-
-;; TRAMP specifics
-(setq tramp-chunksize 8192)
-;; @see https://github.com/syl20bnr/spacemacs/issues/1921
-;; If your tramp is hanging, you can uncomment below line.
-(setq tramp-ssh-controlmaster-options
- "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
-
- ;; Try to display docstrings
- (setq auto-completion-enable-help-tooltip t)
-
-(defun lsp-format-and-save-buffer nil
-  "Format the buffer with LSP and then save"
-  (lsp-format-buffer)
-  (save-buffer)
-  )
-
-;; C mode settings
-(add-hook 'c-mode-hook
-          (lambda ()
-            (fci-mode)
-            (auto-fill-mode)
-            (setq-local fci-column 80)
-            (setq-local fill-column 80)
-            (add-hook 'before-save-hook 'lsp-format-buffer nil 'make-it-local)
-            ))
-(setq-default c-basic-offset 4)
-
-;; Python mode settings
-(add-hook 'python-mode-hook
-          (lambda ()
-            (fci-mode)
-            (auto-fill-mode)
-            (setq flycheck-checker #'python-flake8)
-            (setq-local fci-column 80)
-            (setq-local fill-column 80)
-            (rainbow-delimiters-mode)
-            ))
-(setq-default python-indent-offset 4)
-(setq python-shell-interpreter "python3")
-(setq python-shell-interpreter-args "-i")
-
-; Raise the number of errors flycheck will report:
-; this is unstable but for large files we need to
-(setq flycheck-checker-error-threshold 600)
-
-;; Rust mode settings
-(add-hook 'rustic-mode-hook
-          (lambda ()
-            (fci-mode)
-            (auto-fill-mode)
-            (lsp-ui-mode)
-            (lsp-mode)
-            (setq-local fci-column 100)
-            (setq-local fill-column 100)
-            (add-hook 'before-save-hook 'lsp-format-buffer nil 'make-it-local)
-            ))
-(setq-default rust-indent-offset 4)
+(setq-default fci-column 100)
+(setq-default fill-column 100)
 
 ;; Org mode tweaks and settings
 (add-hook 'org-mode-hook
@@ -126,32 +68,6 @@
           ))
         ))
 
-;; Elm mode settings
-(add-hook 'elm-mode-hook
-          (lambda ()
-            (fci-mode)
-            (auto-fill-mode)
-            (setq-local fci-column 100)
-            (setq-local fill-column 100)
-            (add-hook 'before-save-hook 'lsp-format-buffer nil 'make-it-local)
-            ))
-
-
-;; Jamfile association with conf-mode
-(add-to-list 'auto-mode-alist '("\\.jam\\'" . conf-mode))
-(add-to-list 'auto-mode-alist '("\\Jamfile\\'" . conf-mode))
-
-;; Temp issue solving the void variable from lsp-ui
-;; (setq lsp-ui-doc-winum-ignore t)
-;; (setq lsp-ui-doc--buffer-prefix " *lsp-ui-doc-")
-
-;; Attempt to stop Projectile using .project folders and reading as if files
-;; This appears to be a Doom specific override to prefer .project, see
-;; core/core-projects.el
-;; TODO: Currently done directly in the Doom source
-
-;; Stop Projectile finding files from CCLS
-;(add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
 
 ;;; Keybindings
 
@@ -170,9 +86,6 @@
 (map! :leader :desc "Switch to window 7" "7" #'winum-select-window-7)
 (map! :leader :desc "Switch to window 8" "8" #'winum-select-window-8)
 (map! :leader :desc "Switch to window 9" "9" #'winum-select-window-9)
-
-;; Projectile terminal keybinding from Spacemacs
-(map! :leader :desc "Run term in project root" "p'" #'projectile-run-term)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
